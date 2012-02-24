@@ -216,24 +216,31 @@ namespace AppStoreReview
                 sb.Append("Title:");
                 sb.Append(rev["title"]);
                 sb.Append(Environment.NewLine);
+
                 sb.Append("Stars:" + rev["stars"]);
                 sb.Append(Environment.NewLine);
+                
                 sb.Append("Reviewer:");
                 sb.Append(rev["reviewer"]);
                 sb.Append(Environment.NewLine);
 
-                if (rev["reviewer"] != "Anonymous")
+                if (rev.ContainsKey("version"))
                 {
                     sb.Append("Version:" + rev["version"]);
                     sb.Append(Environment.NewLine);
+                }
+
+                if (rev.ContainsKey("date"))
+                {
                     sb.Append("Date:");
                     sb.Append(rev["date"]);
                     sb.Append(Environment.NewLine);
                 }
-
+                
                 sb.Append("Comment:");
                 sb.Append(rev["comment"]);
                 sb.Append(Environment.NewLine);
+                
                 sb.Append("-------------");
                 sb.Append(Environment.NewLine);
             }
