@@ -1,0 +1,13 @@
+debug/*
+release/*
+obj/*
+*.csuser
+*.suo
+*.user
+*.tmp
+*.db
+*.bak
+bin
+bin/*
+obj
+*.userprefs
