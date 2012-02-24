@@ -9,8 +9,11 @@ HOW TO USE
 --------------------
 
 * Example
+
 var store = new AppStore(364709193); //iBooks
+
 var review = store.GetReviews();
+
 Console.WriteLine(store.ReviewToStr(review));
 
 TODO
