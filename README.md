@@ -1,11 +1,11 @@
 Apple Store Review Client C# Library
 =============================================================
 
-ƒAƒbƒvƒ‹ƒXƒgƒA‚©‚çƒŒƒrƒ…[‚ğæ“¾‚·‚éƒ‰ƒCƒuƒ‰ƒŠ‚Å‚·B
+ã‚¢ãƒƒãƒ—ãƒ«ã‚¹ãƒˆã‚¢ã‹ã‚‰ãƒ¬ãƒ“ãƒ¥ãƒ¼ã‚’å–å¾—ã™ã‚‹ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã§ã™ã€‚
 
-æ“¾‚µ‚½ƒŒƒrƒ…[‚ğƒ[ƒ‹‚Å’èŠú“I‚É‘—M‚µ‚½‚è‚·‚é‚ÆŠJ”­Ò‚Ìƒ‚ƒ`ƒx[ƒVƒ‡ƒ“ƒAƒbƒv‚É‚Â‚È‚ª‚é‚©‚àB
+å–å¾—ã—ãŸãƒ¬ãƒ“ãƒ¥ãƒ¼ã‚’ãƒ¡ãƒ¼ãƒ«ã§å®šæœŸçš„ã«é€ä¿¡ã—ãŸã‚Šã™ã‚‹ã¨é–‹ç™ºè€…ã®ãƒ¢ãƒãƒ™ãƒ¼ã‚·ãƒ§ãƒ³ã‚¢ãƒƒãƒ—ã«ã¤ãªãŒã‚‹ã‹ã‚‚ã€‚
 
-HOW TO USE
+How to use
 --------------------
 
 * Example
@@ -16,8 +16,13 @@ var review = store.GetReviews();
 
 Console.WriteLine(store.ReviewToStr(review));
 
-TODO
+Todo
 --------------------
 
 * Correspond to app store outside of Japan
 * Fix to anonymous reviews
+
+License
+--------------------
+
+MIT License. Copyright (c) 2012 Yasuyuki Harada
