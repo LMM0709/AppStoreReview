@@ -2,12 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("AppStoreReview")]
+[assembly: AssemblyTitle("AppStore")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AppStoreReview")]
-[assembly: AssemblyCopyright("Copyright © yasu")]
+[assembly: AssemblyProduct("AppStore")]
+[assembly: AssemblyCopyright("Copyright © Yasuyuki Harada")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

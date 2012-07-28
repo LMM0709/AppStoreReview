@@ -1,4 +1,4 @@
-Apple Store Review Client C# Library
+Scraping Apple Store Review C# Library
 =============================================================
 
 アップルストアからレビューを取得するライブラリです。
@@ -10,16 +10,17 @@ How to use
 
 * Example
 
-var store = new AppStore(364709193); //iBooks
+var scraper = new AppStore.ReviewScraper();
 
-var review = store.GetReviews();
-
-Console.WriteLine(store.ReviewToStr(review));
+//TODO: You have to search target's AppId.
+//iBooks http://itunes.apple.com/jp/app/ibooks/id364709193?mt=8
+var reviews = scraper.GetReviews(364709193, 1, AppStore.InternationalCode.UnitedStates);
+reviews.ForEach(x => Console.WriteLine(x));
 
 Todo
 --------------------
 
-* Correspond to app store outside of Japan
+* [DONE]Correspond to app store outside of Japan
 * Fix to anonymous reviews
 
 License
