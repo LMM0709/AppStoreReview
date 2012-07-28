@@ -9,10 +9,13 @@ How to use
 --------------------
 
 * Example
+
 You have to search target's AppId in iTunes Store.
 
     var scraper = new AppStore.ReviewScraper();
+
     var reviews = scraper.GetReviews(364709193, 1, AppStore.InternationalCode.UnitedStates);
+
     reviews.ForEach(x => Console.WriteLine(x));
 
 Todo
