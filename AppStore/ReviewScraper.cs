@@ -25,9 +25,10 @@ namespace AppStore
         public List<Review> GetReviews(int id, int reviewPages = 4, int storeCode = InternationalCode.Japan)
         {
             var reviews = new List<Review>();
-
-            for (var i = 0; i <= reviewPages; i++)
+            for (var i = 0; i < reviewPages; i++)
+            {
                 reviews.AddRange(ParseReviews(ConnectAppStore(id, i, storeCode)));
+            }
 
             return reviews;
         }
@@ -41,100 +42,64 @@ namespace AppStore
             var res = req.GetResponse();
 
             var body = "";
-            using (var st = res.GetResponseStream())
-            using (var sr = new StreamReader(st, Encoding.UTF8))
+            using (var stream = res.GetResponseStream())
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                body = sr.ReadToEnd();
+                body = reader.ReadToEnd();
             }
 
             return body;
         }
 
-        private List<Review> ParseReviews(string xml)
+        private IEnumerable<Review> ParseReviews(string xml)
         {
-            var elem = XElement.Load(new StringReader(xml));
-            XNamespace ns = "http://www.apple.com/itms/";
+            var contentXPath = @"/document[1]/view[1]/scrollview[1]/vboxview[1]/view[1]/matrixview[1]/vboxview[1]/vboxview[1]/vboxview";
+            
+            var doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(xml);
 
-            //title
-            var titles = from item
-            in elem.Elements(ns + "View").Elements(ns + "ScrollView")
-            .Elements(ns + "VBoxView").Elements(ns + "View")
-            .Elements(ns + "MatrixView").Elements(ns + "VBoxView").Elements(ns + "VBoxView").Elements(ns + "VBoxView")
-            .Elements(ns + "HBoxView").Elements(ns + "TextView").Elements(ns + "SetFontStyle").Elements(ns + "b")
-                         select item.Value;
-
-            //stars
-            var stars = from item
-            in elem.Elements(ns + "View").Elements(ns + "ScrollView")
-                .Elements(ns + "VBoxView").Elements(ns + "View")
-                .Elements(ns + "MatrixView").Elements(ns + "VBoxView").Elements(ns + "VBoxView").Elements(ns + "VBoxView")
-                .Elements(ns + "HBoxView").Elements(ns + "HBoxView").Elements(ns + "HBoxView")
-            where (string)item.Attribute("topInset") == "1"
-            select item.Attribute("alt").Value;
-
-            //version & date
-            var etcs = from item
-            in elem.Elements(ns + "View").Elements(ns + "ScrollView")
-                .Elements(ns + "VBoxView").Elements(ns + "View")
-                .Elements(ns + "MatrixView").Elements(ns + "VBoxView").Elements(ns + "VBoxView").Elements(ns + "VBoxView")
-                .Elements(ns + "HBoxView").Elements(ns + "TextView").Elements(ns + "SetFontStyle")
-            where ((string)item.Value).Contains("by")
-            select item.Value;
-
-            //comment
-            var comments = from item
-            in elem.Elements(ns + "View").Elements(ns + "ScrollView")
-                .Elements(ns + "VBoxView").Elements(ns + "View")
-                .Elements(ns + "MatrixView").Elements(ns + "VBoxView").Elements(ns + "VBoxView").Elements(ns + "VBoxView")
-                .Elements(ns + "TextView").Elements(ns + "SetFontStyle")
-            where (string)item.Attribute("normalStyle") == "textColor"
-            select item.Value;
-
-            var cnt = titles.Count();
-
-            var reviews = new List<Review>();
-            if (cnt == stars.Count() && cnt == etcs.Count() && cnt == comments.Count())
+            return doc.DocumentNode.SelectNodes(contentXPath).Select(x => new AppStore.Review
             {
-                for (var i = 0; i < cnt; i++)
-                {
-                    var review = new Review();
-                    review.Title = titles.ElementAt(i);
+                Title = x.SelectSingleNode(x.XPath + "/hboxview[1]/textview[1]/setfontstyle[1]/b[1]").InnerText,
+                Stars = SelectStars(x.SelectSingleNode(x.XPath + "/hboxview[1]/hboxview[1]").InnerHtml),
+                Reviewer = x.SelectSingleNode(x.XPath + "/hboxview[2]/textview[1]/setfontstyle[1]/gotourl[1]") != null 
+                    ? x.SelectSingleNode(x.XPath + "/hboxview[2]/textview[1]/setfontstyle[1]/gotourl[1]").InnerText.Trim()
+                    : "Anonymous",
+                Version = SelectVersion(x.SelectSingleNode(x.XPath + "/hboxview[2]/textview[1]/setfontstyle[1]").InnerText),
+                Date = SelectDate(x.SelectSingleNode(x.XPath + "/hboxview[2]/textview[1]/setfontstyle[1]").InnerText),
+                Comment = x.SelectSingleNode(x.XPath + "/textview[1]/setfontstyle[1]").InnerText,
+            });
+        }
 
-                    var starsCount = 0;
-                    int.TryParse(new Regex(@"\d").Match(stars.ElementAt(i)).Value, out starsCount);
-                    review.Stars = starsCount;
+        private int SelectStars(string content)
+        {
+            var reg = new Regex("alt\\s*=\\s*(?:\"(?<1>[^\"]*)|(?<1>\\S+)) star",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-                    var str = (string)etcs.ElementAt(i);
-                    var tmp = str.Split('\n');
+            var stars = 0;
+            return reg.IsMatch(content) && int.TryParse(reg.Match(content).Groups[1].Value, out stars)
+                ? stars
+                : 0;
+        }
 
-                    foreach (var s in tmp)
-                    {
-                        var reg = new Regex(@"Version \d+.\d+.\d+");
-                        var result = reg.Match(s);
-                        if (result.Success)
-                            review.Version = result.Value.Replace("Version ", "");
+        private string SelectVersion(string content)
+        {
+            var reg = new Regex("Version\\s *\\s*(?:\"(?<1>[^\"]*)|(?<1>\\S+))",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-                        reg = new Regex(@"\d\d-...-\d\d\d\d");
-                        result = reg.Match(s);
-                        if (result.Success)
-                            review.Date = result.Value;
+            return reg.IsMatch(content)
+                ? reg.Match(content).Groups[1].Value
+                : null;
+        }
 
-                        if (s.Contains("Anonymous"))
-                            review.Reviewer = "Anonymous";
-                        else if (s.Contains("by"))
-                        {
-                            reg = new Regex(@" +.+ +");
-                            result = reg.Match(s);
-                            if (result.Success)
-                                review.Reviewer = tmp[4].Trim();
-                        }
-                    }
-                    review.Comment = comments.ElementAt(i);
-                    reviews.Add(review);
-                }
-            }
+        private string SelectDate(string content)
+        {
+            var reg = new Regex(@"\d\d-...-\d\d\d\d",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-            return reviews;
+            return reg.IsMatch(content)
+                ? reg.Match(content).Groups[0].Value
+                : null;
         }
     }
 }

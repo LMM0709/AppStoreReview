@@ -19,16 +19,25 @@ namespace AppStore
             sb.Append("Title:" + Title + Environment.NewLine);
 
             if (Stars != 0)
-                sb.Append("Stars:" + Stars + Environment.NewLine);
-            
+            {
+                var star = '☆';
+                sb.Append("Stars:");
+                Enumerable.Range(0, Stars).ToList().ForEach(x => sb.Append(star));
+                sb.Append(Environment.NewLine);
+            }
+
             sb.Append("Reviewer:" + Reviewer + Environment.NewLine);
 
-            if(!string.IsNullOrEmpty(Version))
+            if (!string.IsNullOrEmpty(Version))
+            {
                 sb.Append("Version:" + Version + Environment.NewLine);
+            }
 
             if (!string.IsNullOrEmpty(Date))
+            {
                 sb.Append("Date:" + Date + Environment.NewLine);
-            
+            }
+
             sb.Append("Comment:" + Comment + Environment.NewLine);
             return sb.ToString();
         }
