@@ -27,4 +27,4 @@ Todo
 License
 --------------------
 
-MIT License. Copyright (c) 2012 Yasuyuki Harada
+Ms-PL
